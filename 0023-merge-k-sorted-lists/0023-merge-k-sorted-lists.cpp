@@ -9,61 +9,31 @@
  * };
  */
 class Solution {
-    struct node {
-        ListNode *curr;    //Current node
-        int idx;    //List index number
-        node(ListNode *a,int b)
-        {
-            curr = a;
-            idx = b;
-        }
-    };
-    struct compare {
-    bool operator()(node a, node b)
-    {
-        return a.curr->val >b.curr->val;
-    }
-};
 public:
-    ListNode* mergeKLists(vector<ListNode*>& lists) {
-        int k = lists.size();
-        if(k==0)
-            return NULL;
-        ListNode *head,*tail;
-        head=tail=NULL;
-        priority_queue<node,vector<node>,compare> heap;
-        vector<ListNode*> ptr(k);   //Current node ptrs for all the lists
-        //Assign all the current ptrs and BUILD_HEAP
-        for(int i=0;i<k;++i)
+    ListNode* mergeKLists(vector<ListNode*>& lists)
+    {
+        //min heap based on Node value, the minimum value will be at the top in priority queue
+        priority_queue<pair<int, ListNode*>, vector<pair<int, ListNode*>>, greater<pair<int, ListNode*>>> pq;
+        for (ListNode* listHead : lists) 
         {
-            ptr[i]=lists[i];
-            if(ptr[i]!=NULL)
-                heap.push(node(ptr[i],i));
+            if (listHead != NULL) pq.push({listHead->val, listHead});
         }
-        
-        if(heap.empty())
-            return NULL;
-        //Insert 1st node
-        head=tail=heap.top().curr;
-        int idx = heap.top().idx;
-        heap.pop();
-        ptr[idx]=ptr[idx]->next;
-        if(ptr[idx])    //Push newly pointed node if not NULL
-            heap.push(node(ptr[idx],idx));
-        
-        //Make list with rest of the nodes
-        while(!heap.empty())
+        //=================================================================================
+        ListNode* newHead = new ListNode(-1); //dummy node for the new Linked List
+        ListNode* newTail = newHead;
+        while(!pq.empty())
         {
-            ListNode *temp=heap.top().curr; //Pop root node
-            idx=heap.top().idx;
-            heap.pop();
+            int minVal = pq.top().first;
+            ListNode* minNode = pq.top().second;
+            pq.pop();
+            if (minNode->next != NULL) 
+                pq.push({minNode->next->val, minNode->next});
             
-            tail->next=temp;    //Add newnode to list
-            tail=tail->next;
-            ptr[idx]=ptr[idx]->next;    //Update current pointer
-            if(ptr[idx])   //Push newly pointed node if not NULL
-                heap.push(node(ptr[idx],idx));
+            newTail->next = minNode;  //append the min Node to the new Linked List
+            newTail = minNode; //make the minNode as the new tail of new Linked List
         }
-        return head;
+        //=======================================================================================
+        return newHead->next;
+        
     }
 };
