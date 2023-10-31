@@ -1,24 +1,30 @@
+vector<vector<string>> solveNQueens(int N) {
+ans.clear();
+board.resize(N, string(N, '.'));
+place(0,0,0,0);
+return ans;
 }
-// Recursive Function (solve) - It basically tries all possible placement of queen for the current row & recurses for it's next row
-void solve(vector<string>& board, int row) {
-// Base condition.
-// We reached the last row, so we have a solution so we add it to the solution vector
-if(row == size(board)) {
-sols.push_back(board);
+​
+private:
+vector<vector<string>> ans;
+vector<string> board;
+​
+void place(int i, int vert, int ldiag, int rdiag) {
+int N = board.size();
+if (i == N) {
+vector<string> res;
+for (auto row : board) res.push_back(row);
+ans.push_back(res);
 return;
 }
-// Try placing a queen on each column for a given row.
-// Explore next row by placing Q at each valid column for the current row
-for(int col = 0; col < size(board); col++){
-if(isSafe(board, row, col)) {
-board[row][col] = 'Q';    // Queen placed on a valid cell
-solve(board, row + 1);    // Exploring next row
-board[row][col] = '.';    // Backtracking to get all possible solutions
-}
+for (int j = 0; j < N; j++) {
+int vmask = 1 << j, lmask = 1 << (i+j), rmask = 1 << (N-i-1+j);
+if (vert & vmask || ldiag & lmask || rdiag & rmask) continue;
+board[i][j] = 'Q';
+place(i+1, vert | vmask, ldiag | lmask, rdiag | rmask);
+board[i][j] = '.';
 }
 }
 };
-Time Complexity : O(N!), Since we have N choices in the first row, then N-1 choices in the second row and so on so the overall complexity become O(N!)
-Space Complexity: O(N*N), Just the board and recursive stack space
 Time Complexity : O(N!), Since we have N choices in the first row, then N-1 choices in the second row and so on so the overall complexity become O(N!)
 Space Complexity: O(N*N), Just the board and recursive stack space
